@@ -11,16 +11,16 @@ object MaximumSubarray {
   }
 
   def maximumSubarray(a: Vector[Int]): Vector[Int] = {
-    var max = a.head
-    var runningContiguousMax, contiguousMax = a.head
+    var globalMax = a.head
+    var contiguousMax, runningContiguousMax = a.head
 
     for (x <- a.drop(1)) {
-      runningContiguousMax = math.max(x, x + runningContiguousMax)
+      runningContiguousMax = math.max(x, runningContiguousMax + x)
       contiguousMax = math.max(contiguousMax, runningContiguousMax)
 
-      max = math.max(max, math.max(x, x + max))
+      globalMax = math.max(globalMax, math.max(x, x + globalMax))
     }
 
-    Vector[Int](contiguousMax, max)
+    Vector[Int](runningContiguousMax, globalMax)
   }
 }
