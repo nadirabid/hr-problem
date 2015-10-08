@@ -35,41 +35,41 @@ object FeedOptimizer {
   def optimalStoryFeed(storyEvents: Vector[StoryEvent], maxHeight: Int): Feed = {
     val feeds = Array.fill(storyEvents.length + 1)(Array.fill(maxHeight + 1)(Feed()))
 
-    for (i <- storyEvents.length - 1 to 0 by -1) {
+    for (i <- storyEvents.indices) {
       for (j <- 0 to maxHeight) {
         val storyEvent = storyEvents(i)
-        val previousFeedIfStoryIsIgnored = feeds(i + 1)(j)
+        val previousFeedIfStoryIsIgnored = feeds(i)(j)
 
         if (j >= storyEvent.height) {
-          val previousFeedIfStoryIsTaken = feeds(i + 1)(j - storyEvent.height)
+          val previousFeedIfStoryIsTaken = feeds(i)(j - storyEvent.height)
 
           if (storyEvent.score + previousFeedIfStoryIsTaken.totalScore == previousFeedIfStoryIsIgnored.totalScore) {
             if (previousFeedIfStoryIsTaken.stories.length + 1 < previousFeedIfStoryIsIgnored.stories.length) {
-              feeds(i)(j) = Feed(
+              feeds(i + 1)(j) = Feed(
                 storyEvent.score + previousFeedIfStoryIsTaken.totalScore,
-                storyEvent.id :+ previousFeedIfStoryIsTaken.stories
+                previousFeedIfStoryIsTaken.stories :+ storyEvent.id
               )
             }
             else {
-              feeds(i)(j) = previousFeedIfStoryIsIgnored
+              feeds(i + 1)(j) = previousFeedIfStoryIsIgnored
             }
           }
           else if (storyEvent.score + previousFeedIfStoryIsTaken.totalScore > previousFeedIfStoryIsIgnored.totalScore) {
-            feeds(i)(j) = Feed(
+            feeds(i + 1)(j) = Feed(
               storyEvent.score + previousFeedIfStoryIsTaken.totalScore,
-              storyEvent.id :+ previousFeedIfStoryIsTaken.stories
+              previousFeedIfStoryIsTaken.stories :+ storyEvent.id
             )
           }
           else {
-            feeds(i)(j) = previousFeedIfStoryIsIgnored
+            feeds(i + 1)(j) = previousFeedIfStoryIsIgnored
           }
         }
         else {
-          feeds(i)(j) = previousFeedIfStoryIsIgnored
+          feeds(i + 1)(j) = previousFeedIfStoryIsIgnored
         }
       }
     }
 
-    feeds.head.last
+    feeds.last.last
   }
 }
